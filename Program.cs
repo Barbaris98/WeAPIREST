@@ -39,9 +39,26 @@ app.MapDelete("/api/users/{id}", (string id) =>
     return Results.Json(user);
 });
 
+app.MapPost("/api/users", (Person user) =>
+{
+    // устанавливаем id для нового пользователя
+    user.Id = Guid.NewGuid().ToString();
+    // добавляем пользователя в список
+    users.Add(user);
+    return user;
+});
 
-
-
+app.MapPut("/api/users", (Person userData) =>
+{
+    //получаем пользователя по id
+    var user = users.FirstOrDefault(x => x.Id == userData.Id);
+    // если не найден, отправляем статусный код и сообщение об ошибке
+    if (user == null) return Results.NotFound(new { message = "Пользователь не найден" });
+    // если пользователь найден, изменяем его данные и отправляем обратно клиенту
+    user.Age = userData.Age;
+    user.Name = userData.Name;
+    return Results.Json(user);
+});
 
 app.Run();
 
